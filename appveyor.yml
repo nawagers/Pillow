@@ -2,6 +2,7 @@ version: '{build}'
 clone_folder: c:\pillow
 init:
 - ECHO %PYTHON%
+- ECHO %PATH%
 #- ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 # Uncomment previous line to get RDP access during the build.
 
@@ -49,6 +50,8 @@ build_script:
 - ps: |
       if ($env:PYTHON -eq "c:/msys64/mingw32")
       {
+        pacman -Ss gcc
+        pwd
         c:\msys64\usr\bin\bash -l -c c:\\pillow\\winbuild\\appveyor_build_msys2.sh
         Write-Host "through install"
         $host.SetShouldExit(0)  
@@ -76,27 +79,6 @@ artifacts:
 - path: pillow\dist\*.wheel
   name: wheel
 
-before_deploy:
-  - cd c:\pillow
-  - mv PIL.temp PIL
-  - '%PYTHON%\%PIP_DIR%\pip.exe install wheel'
-  - cd c:\pillow\winbuild\
-  - '%PYTHON%\%EXECUTABLE% c:\pillow\winbuild\build.py --wheel'
-  - cd c:\pillow
-  - ps: Get-ChildItem .\dist\*.* | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
-
-deploy:
-  provider: S3
-  region: us-west-2
-  access_key_id: AKIAIRAXC62ZNTVQJMOQ
-  secret_access_key:
-    secure: Hwb6klTqtBeMgxAjRoDltiiqpuH8xbwD4UooDzBSiCWXjuFj1lyl4kHgHwTCCGqi
-  bucket: pillow-nightly
-  folder: win/$(APPVEYOR_BUILD_NUMBER)/
-  artifact: /.*egg|wheel/
-  on:
-    branch: master
-    deploy: YES
     
 
 # Uncomment the following line to get RDP access after the build/test and block for
