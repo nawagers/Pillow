@@ -50,8 +50,9 @@ build_script:
 - ps: |
       if ($env:PYTHON -eq "c:/msys64/mingw32")
       {
-        pacman -Ss gcc
-        pwd
+        c:\msys64\usr\bin\bash -l -c pacman -Ss gcc
+        c:\msys64\usr\bin\bash -l -c printenv
+        c:\msys64\usr\bin\bash -l -c pwd
         c:\msys64\usr\bin\bash -l -c c:\\pillow\\winbuild\\appveyor_build_msys2.sh
         Write-Host "through install"
         $host.SetShouldExit(0)  
